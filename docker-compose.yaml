@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+    logspout:
+        image: bekt/logspout-logstash
+        depends_on: 
+            - elk
+        restart: always
+        environment:
+            ROUTE_URIS: logstash+udp://elk:5000
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+    elk:
+        image: sebp/elk
+        volumes:
+            - elk-data:/var/lib/elasticsearch
+            - ./logstash.conf:/etc/logstash/conf.d/logspout.conf:ro
+        ports:
+            - 5601:5601
+            - 9200:9200
+            - 5044:5044
+            
+volumes:
+    elk-data:
